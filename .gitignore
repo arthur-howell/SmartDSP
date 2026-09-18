@@ -1,0 +1,39 @@
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+*secret*
+*token*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+
+# Runtime
+*.log
+*.pid
+*.sock
+*.fifo
+statefile.yml
+
+# SmartDSP runtime/generated data
+backups/
+runtime/
+state/
+cache/
+
+# Development artifacts
+*.bak
+*.before-*
+*~
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
