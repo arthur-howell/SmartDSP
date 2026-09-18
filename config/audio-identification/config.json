@@ -1,0 +1,10 @@
+{
+    "enabled": false,
+    "capture_seconds": 5.0,
+    "silence_seconds": 3.0,
+    "silence_threshold_dbfs": -100.0,
+    "rearm_seconds": 1.0,
+    "sample_rate": 48000,
+    "channels": 1,
+    "recognition_timeout_seconds": 15.0
+}
