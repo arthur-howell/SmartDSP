@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>SMRT DSP — Quantum Horizon</title>
+
+<style>
+html,
+body {
+    width:100%;
+    height:100%;
+    margin:0;
+    overflow:hidden;
+    background:#01040a;
+}
+
+#stage {
+    position:fixed;
+    inset:0;
+}
+
+canvas {
+    display:block;
+    width:100%;
+    height:100%;
+}
+</style>
+</head>
+
+<body>
+
+<div id="stage"></div>
+
+<script type="module">
+import * as THREE
+    from "./vendor/three.module.js";
+
+import {
+    QuantumHorizon
+} from "./visualizers/atomic-modern/quantum-horizon.js";
+
+
+const stage =
+    document.getElementById("stage");
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:"high-performance"
+    });
+
+renderer.setPixelRatio(
+    Math.min(
+        window.devicePixelRatio,
+        1.5
+    )
+);
+
+stage.appendChild(
+    renderer.domElement
+);
+
+const scene =
+    new THREE.Scene();
+
+const camera =
+    new THREE.PerspectiveCamera(
+        48,
+        1,
+        .1,
+        250
+    );
+
+const visualizer =
+    new QuantumHorizon({
+        scene,
+        camera,
+        renderer
+    });
+
+
+function resize() {
+    const w =
+        stage.clientWidth;
+
+    const h =
+        stage.clientHeight;
+
+    renderer.setSize(
+        w,
+        h,
+        false
+    );
+
+    camera.aspect =
+        w / h;
+
+    camera.updateProjectionMatrix();
+}
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+resize();
+
+
+let lastMeterFetch = 0;
+
+async function updateMeters(now) {
+    if (
+        now - lastMeterFetch <
+        50
+    ) return;
+
+    lastMeterFetch = now;
+
+    try {
+        const response =
+            await fetch(
+                "/api/meters",
+                {
+                    cache:"no-store"
+                }
+            );
+
+        if (!response.ok)
+            return;
+
+        visualizer.setAudio(
+            await response.json()
+        );
+
+    } catch {
+        /*
+         * No meter stream yet:
+         * keep the scene alive.
+         */
+    }
+}
+
+
+function frame(now) {
+    requestAnimationFrame(frame);
+
+    updateMeters(now);
+
+    visualizer.animate();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+requestAnimationFrame(frame);
+</script>
+
+</body>
+</html>

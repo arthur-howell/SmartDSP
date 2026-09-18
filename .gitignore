@@ -37,3 +37,7 @@ cache/
 # Editors
 .vscode/
 .idea/
+
+# Python generated files
+__pycache__/
+*.py[cod]

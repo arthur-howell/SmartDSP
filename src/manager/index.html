@@ -1,0 +1,3541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SMRT DSP</title>
+
+<style>
+:root {
+    /* ATOMIC MODERN — BUILD PALETTE */
+    --blue:   #2f80c9;
+    --green:  #65a65a;
+    --purple: #7653a6;
+    --red:    #c94d45;
+    --orange: #dc8438;
+
+    --black:  #0d0f11;
+    --body:   #121518;
+    --panel:  #191d21;
+    --panel2: #20252a;
+    --line:   #343a40;
+    --text:   #e7e9e8;
+    --muted:  #8c9398;
+
+    --rail-width: 205px;
+    --header-height: 72px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--black);
+    color: var(--text);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+body {
+    display: grid;
+    grid-template-rows: var(--header-height) 1fr;
+}
+
+/* ───────────────── HEADER ───────────────── */
+
+header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 26px;
+    background: #101316;
+    border-bottom: 1px solid var(--line);
+}
+
+header::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue) 0 20%,
+            var(--green) 20% 40%,
+            var(--purple) 40% 60%,
+            var(--red) 60% 80%,
+            var(--orange) 80% 100%
+        );
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+}
+
+.atomic-mark {
+    width: 37px;
+    height: 37px;
+    position: relative;
+}
+
+.atomic-core {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    left: 14px;
+    top: 14px;
+    border-radius: 50%;
+    background: var(--orange);
+}
+
+.orbit {
+    position: absolute;
+    width: 37px;
+    height: 14px;
+    top: 11px;
+    left: 0;
+    border: 1.5px solid var(--blue);
+    border-radius: 50%;
+}
+
+.orbit.two {
+    border-color: var(--purple);
+    transform: rotate(60deg);
+}
+
+.orbit.three {
+    border-color: var(--green);
+    transform: rotate(-60deg);
+}
+
+.brand-copy strong {
+    display: block;
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: .13em;
+}
+
+.brand-copy span {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+}
+
+.header-status {
+    display: flex;
+    align-items: stretch;
+    height: 42px;
+}
+
+.status-block {
+    min-width: 105px;
+    padding: 3px 17px 0;
+    border-left: 1px solid #30353a;
+}
+
+.status-label {
+    color: var(--muted);
+    font-size: 8px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+
+.status-value {
+    margin-top: 5px;
+    font-size: 12px;
+    letter-spacing: .07em;
+}
+
+.status-rate .status-value {
+    color: var(--blue);
+}
+
+.status-voice .status-value {
+    color: var(--orange);
+}
+
+.status-health .status-value {
+    color: var(--green);
+}
+
+.status-health .status-value::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px rgba(101,166,90,.55);
+}
+
+/* ───────────────── BODY ───────────────── */
+
+main {
+    display: grid;
+    grid-template-columns: var(--rail-width) 1fr;
+    min-height: 0;
+}
+
+/* ───────────────── NAVIGATION ───────────────── */
+
+nav {
+    background: #161a1e;
+    border-right: 1px solid var(--line);
+    padding: 23px 12px;
+}
+
+.nav-heading {
+    padding: 0 14px 14px;
+    color: #687078;
+    font-size: 8px;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+}
+
+button.nav {
+    --accent: var(--blue);
+
+    position: relative;
+    appearance: none;
+    width: 100%;
+    height: 43px;
+    margin: 0 0 5px;
+    padding: 0 14px 0 18px;
+
+    border: 0;
+    border-left: 3px solid transparent;
+    border-radius: 2px;
+
+    background: transparent;
+    color: #a9afb3;
+
+    cursor: pointer;
+    text-align: left;
+    text-transform: uppercase;
+
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .12em;
+
+    transition:
+        background .12s,
+        color .12s,
+        border-color .12s;
+}
+
+button.nav:hover {
+    background: #20252a;
+    color: white;
+}
+
+button.nav.active {
+    background: #252a30;
+    border-left-color: var(--accent);
+    color: var(--accent);
+}
+
+button.nav::after {
+    content: "";
+    position: absolute;
+    right: 13px;
+    top: 18px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: .35;
+}
+
+button.nav.active::after {
+    opacity: 1;
+    box-shadow: 0 0 7px var(--accent);
+}
+
+.nav-overview    { --accent: var(--blue)   !important; }
+.nav-camilla     { --accent: var(--green)  !important; }
+.nav-routing     { --accent: var(--purple) !important; }
+.nav-voicing     { --accent: var(--orange) !important; }
+.nav-meters      { --accent: var(--red)    !important; }
+.nav-nowplaying  { --accent: var(--blue)   !important; }
+.nav-visualizer  { --accent: var(--purple) !important; }
+.nav-system      { --accent: var(--green)  !important; }
+
+/* five-color calibration strip */
+
+.palette {
+    position: absolute;
+    bottom: 25px;
+    left: 27px;
+    display: flex;
+    gap: 6px;
+}
+
+.palette span {
+    width: 18px;
+    height: 4px;
+}
+
+.palette .b { background: var(--blue); }
+.palette .g { background: var(--green); }
+.palette .p { background: var(--purple); }
+.palette .r { background: var(--red); }
+.palette .o { background: var(--orange); }
+
+/* ───────────────── WORKSPACE ───────────────── */
+
+.workspace {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+
+    background-color: var(--body);
+    background-image:
+        radial-gradient(circle, #292e32 1px, transparent 1px);
+    background-size: 27px 27px;
+}
+
+iframe {
+    position: absolute;
+    inset: 0;
+    display: none;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #111417;
+}
+
+iframe.active {
+    display: block;
+}
+
+.page {
+    position: absolute;
+    inset: 0;
+    display: none;
+    overflow: auto;
+    padding: 40px;
+}
+
+.page.active {
+    display: block;
+}
+
+/* ───────────────── CARDS ───────────────── */
+
+.console {
+    width: min(980px, 100%);
+}
+
+.section-heading {
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    color: var(--blue);
+    margin-bottom: 8px;
+    font-size: 9px;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+}
+
+.section-heading h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: .04em;
+}
+
+.section-heading p {
+    max-width: 650px;
+    margin: 9px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(27,31,35,.96);
+    border: 1px solid var(--line);
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue),
+            var(--green),
+            var(--purple),
+            var(--red),
+            var(--orange)
+        );
+}
+
+/* ───────────────── OVERVIEW ───────────────── */
+
+.signal-card {
+    padding: 29px;
+}
+
+.signal-label {
+    color: #777f84;
+    font-size: 8px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+}
+
+.signal-chain {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr 40px 1fr 40px 1fr;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.signal-node {
+    position: relative;
+    height: 86px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 18px;
+    background: #22272c;
+    border: 1px solid #3b4248;
+}
+
+.signal-node::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    width: 4px;
+    background: var(--node);
+}
+
+.signal-node small {
+    color: #777e84;
+    font-size: 8px;
+    letter-spacing: .16em;
+}
+
+.signal-node strong {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .06em;
+}
+
+.source  { --node: var(--blue); }
+.camilla { --node: var(--green); }
+.voice   { --node: var(--orange); }
+.output  { --node: var(--purple); }
+
+.arrow {
+    text-align: center;
+    color: var(--red);
+    font-size: 19px;
+}
+
+/* ───────────────── STATUS GRID ───────────────── */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.metric {
+    min-height: 112px;
+    padding: 20px;
+    background: rgba(28,32,36,.96);
+    border: 1px solid var(--line);
+}
+
+.metric-label {
+    color: var(--muted);
+    font-size: 8px;
+    letter-spacing: .18em;
+}
+
+.metric-value {
+    margin-top: 17px;
+    font-size: 21px;
+    font-weight: 300;
+}
+
+.metric:nth-child(1) .metric-value { color: var(--blue); }
+.metric:nth-child(2) .metric-value { color: var(--green); }
+.metric:nth-child(3) .metric-value { color: var(--orange); }
+
+/* ───────────────── VOICING ───────────────── */
+
+.voicing-panel {
+    padding: 28px;
+}
+
+.preset-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.preset {
+    appearance: none;
+    min-width: 125px;
+    padding: 13px 16px;
+
+    border: 1px solid #41484e;
+    background: #23282d;
+    color: #aeb4b8;
+
+    font-size: 10px;
+    letter-spacing: .12em;
+    cursor: pointer;
+}
+
+.preset:nth-child(1) { border-bottom: 3px solid var(--blue); }
+.preset:nth-child(2) { border-bottom: 3px solid var(--green); }
+.preset:nth-child(3) { border-bottom: 3px solid var(--purple); }
+.preset:nth-child(4) { border-bottom: 3px solid var(--red); }
+.preset:nth-child(5) { border-bottom: 3px solid var(--orange); }
+
+.preset.selected,
+.preset-button.selected {
+    background: #355E3B !important;
+    border-color: #4F7942 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 2px #4F7942, 0 8px 20px rgba(0,0,0,.35);
+}
+</style>
+  <link rel="stylesheet" href="/vendor/gridstack/gridstack.min.css">
+</head>
+
+<body>
+
+<header>
+
+<div class="brand">
+    <div class="atomic-mark">
+        <div class="orbit"></div>
+        <div class="orbit two"></div>
+        <div class="orbit three"></div>
+        <div class="atomic-core"></div>
+    </div>
+
+    <div class="brand-copy">
+        <strong>SMRT DSP</strong>
+        <span>Digital Signal Processor</span>
+    </div>
+</div>
+
+<div class="header-status">
+
+    <div class="status-block">
+        <div class="status-label">Source</div>
+        <div class="status-value">WiiM Ultra</div>
+    </div>
+
+    <div class="status-block status-rate">
+        <div class="status-label">Clock</div>
+        <div class="status-value">192 kHz</div>
+    </div>
+
+    <div class="status-block status-voice">
+        <div class="status-label">Voicing</div>
+        <div class="status-value">REFERENCE</div>
+    </div>
+
+    <div class="status-block status-health">
+        <div class="status-label">System</div>
+        <div class="status-value">HEALTHY</div>
+    </div>
+
+</div>
+</header>
+
+<main>
+
+<nav>
+
+<div class="nav-heading">Control Surface</div>
+
+<button class="nav nav-overview active" data-page="overview">Overview</button>
+<button class="nav nav-camilla" data-page="camilla">Camilla</button>
+<button class="nav nav-routing" data-page="routing">Routing</button>
+<button class="nav nav-voicing" data-page="voicing">Voicing</button>
+<button class="nav nav-meters" data-page="meters">Meters</button>
+<button class="nav nav-nowplaying" data-page="nowplaying">Now Playing</button>
+<button class="nav nav-visualizer" data-page="visualizer">Visualizer</button>
+<button class="nav nav-system" data-page="system">System</button>
+
+<div class="palette">
+    <span class="b"></span>
+    <span class="g"></span>
+    <span class="p"></span>
+    <span class="r"></span>
+    <span class="o"></span>
+</div>
+
+</nav>
+
+<section class="workspace">
+
+<!-- OVERVIEW -->
+
+<div id="overview" class="page active">
+
+<div class="console">
+
+<div class="section-heading">
+    <div class="eyebrow">System Overview</div>
+    <h1>Reference Signal Processor</h1>
+    <p>
+        Central control and monitoring surface for the SMRT-Homer
+        digital audio processing appliance.
+    </p>
+</div>
+
+<div class="card signal-card">
+
+<div class="signal-label">Active Signal Path</div>
+
+<div class="signal-chain">
+
+<div class="signal-node source">
+    <small>INPUT</small>
+    <strong>SOURCE</strong>
+</div>
+
+<div class="arrow">→</div>
+
+<div class="signal-node camilla">
+    <small>DSP ENGINE</small>
+    <strong>CAMILLA DSP</strong>
+</div>
+
+<div class="arrow">→</div>
+
+<div class="signal-node voice">
+    <small>TRANSFER</small>
+    <strong>REFERENCE</strong>
+</div>
+
+<div class="arrow">→</div>
+
+<div class="signal-node output">
+    <small>OUTPUT</small>
+    <strong>TOPPING D90</strong>
+</div>
+
+</div>
+</div>
+
+<div class="grid">
+
+<div class="metric">
+    <div class="metric-label">PROCESSING RATE</div>
+    <div class="metric-value">192 kHz</div>
+</div>
+
+<div class="metric">
+    <div class="metric-label">AUDIO ENGINE</div>
+    <div class="metric-value">ONLINE</div>
+</div>
+
+<div class="metric">
+    <div class="metric-label">ACTIVE VOICING</div>
+    <div class="metric-value">REFERENCE</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<!-- EXISTING APPLICATIONS -->
+
+<iframe
+    id="camilla"
+    src="/camillagui/gui/index.html"
+    title="CamillaDSP">
+</iframe>
+
+<iframe
+    id="routing"
+    src="/visualizer/"
+    title="PipeWire Routing">
+</iframe>
+
+<!-- VOICING -->
+
+<div id="voicing" class="page">
+
+<div class="console">
+
+<div class="section-heading">
+    <div class="eyebrow" style="color:var(--orange)">Transfer Character</div>
+    <h1>Voicing</h1>
+    <p>
+        Nonlinear transfer profiles remain permanently inside the
+        signal graph and can be changed without altering routing.
+    </p>
+</div>
+
+<div class="card voicing-panel">
+
+<div class="preset-row">
+<div id="voicingLibrary" class="voicing-library">
+    <div class="voicing-loading">LOADING VOICINGS...</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- METERS -->
+
+<div id="meters" class="page">
+<div class="console">
+<div class="section-heading">
+<div class="eyebrow" style="color:var(--red)">Signal Analysis</div>
+<h1>Meters</h1>
+</div>
+<div class="card placeholder-card">
+<h2>Measurement Engine</h2>
+<p>Levels, spectrum, waveform and processing telemetry will populate this surface.</p>
+</div>
+</div>
+</div>
+
+<!-- NOW PLAYING -->
+
+<div id="nowplaying" class="page">
+<div class="console">
+<div class="section-heading">
+<div class="eyebrow">Program Information</div>
+<h1>Now Playing</h1>
+</div>
+<div class="card placeholder-card">
+<h2>Source Identification</h2>
+<p>Metadata and PCM fingerprint identification will populate this surface.</p>
+</div>
+</div>
+</div>
+
+<!-- VISUALIZER -->
+
+<div id="visualizer" class="page">
+<div class="console">
+<div class="section-heading">
+<div class="eyebrow" style="color:var(--purple)">Display Engine</div>
+<h1>Visualizer</h1>
+</div>
+<div class="card placeholder-card">
+<h2>Atomic Modern Visualization</h2>
+<p>Reactive HDMI visualization and display controls will populate this surface.</p>
+</div>
+</div>
+</div>
+
+<!-- SYSTEM -->
+
+<div id="system" class="page">
+<div class="console">
+<div class="section-heading">
+<div class="eyebrow" style="color:var(--green)">Appliance Status</div>
+<h1>System</h1>
+</div>
+<div class="card placeholder-card">
+<h2>Processor Health</h2>
+<p>PipeWire, CamillaDSP, plugin, USB, temperature and service telemetry will populate this surface.</p>
+</div>
+</div>
+</div>
+
+</section>
+</main>
+
+<script>
+const buttons = document.querySelectorAll("button.nav");
+const pages = document.querySelectorAll(
+    ".workspace > .page, .workspace > iframe"
+);
+
+function showPage(name) {
+
+    pages.forEach(page => {
+        page.classList.remove("active");
+    });
+
+    buttons.forEach(button => {
+        button.classList.remove("active");
+    });
+
+    const page = document.getElementById(name);
+    const button = document.querySelector(
+        `[data-page="${name}"]`
+    );
+
+    if (page) page.classList.add("active");
+    if (button) button.classList.add("active");
+
+    history.replaceState(null, "", "#" + name);
+}
+
+buttons.forEach(button => {
+    button.addEventListener("click", () => {
+        showPage(button.dataset.page);
+    });
+});
+
+const requested =
+    window.location.hash.substring(1);
+
+if (requested &&
+    document.getElementById(requested)) {
+    showPage(requested);
+}
+</script>
+
+
+<style id="smrt-gridstack-meters">
+#meters {
+    overflow: hidden !important;
+}
+
+#meters .page-head {
+    margin-bottom: 8px;
+}
+
+#smrtMeterToolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+#smrtMeterStatus {
+    font-family: monospace;
+    font-size: 11px;
+    opacity: .70;
+}
+
+.smrt-layout-buttons {
+    display: flex;
+    gap: 7px;
+}
+
+.smrt-layout-buttons button {
+    border: 1px solid #3b4248;
+    background: #171c20;
+    color: #d9dee2;
+    border-radius: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: .08em;
+}
+
+.smrt-layout-buttons button:hover {
+    border-color: #48a9ff;
+}
+
+#smrtLayoutEdit.active {
+    border-color: #ff9f43;
+    color: #ff9f43;
+}
+
+#smrtMeterGrid {
+    height: calc(100vh - 150px);
+    min-height: 560px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.grid-stack-item-content {
+    background: #111519;
+    border: 1px solid #30373d;
+    border-radius: 7px;
+    overflow: hidden;
+    box-shadow:
+        inset 0 0 20px rgba(0,0,0,.30),
+        0 3px 12px rgba(0,0,0,.20);
+}
+
+.smrt-widget {
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 9px;
+}
+
+.smrt-widget-title {
+    flex: 0 0 auto;
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    opacity: .72;
+    margin-bottom: 5px;
+    user-select: none;
+}
+
+.smrt-canvas {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: block;
+    background: #090c0e;
+    border-radius: 4px;
+}
+
+.smrt-vu-widget {
+    background: #d8cfad;
+    color: #161616;
+}
+
+.smrt-vu-widget .smrt-widget-title {
+    opacity: .75;
+}
+
+.smrt-vu-widget canvas {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+}
+
+.smrt-readouts {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px 8px;
+    margin-top: 4px;
+    font-family: monospace;
+    font-size: 10px;
+}
+
+.smrt-stereo-values {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.smrt-stereo-values label {
+    display: block;
+    opacity: .55;
+    font-size: 9px;
+    letter-spacing: .12em;
+}
+
+.smrt-stereo-values strong {
+    font-family: monospace;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.grid-stack.editing .grid-stack-item-content {
+    outline: 1px dashed rgba(255,159,67,.55);
+}
+
+.grid-stack.editing .smrt-widget-title {
+    cursor: move;
+    color: #ff9f43;
+}
+
+/* Atomic Modern identity */
+#widget-spectrum  .grid-stack-item-content { border-top: 3px solid #48a9ff; }
+#widget-waveform  .grid-stack-item-content { border-top: 3px solid #b48cff; }
+#widget-vector    .grid-stack-item-content { border-top: 3px solid #61d095; }
+#widget-stereo    .grid-stack-item-content { border-top: 3px solid #ff6464; }
+#widget-vul       .grid-stack-item-content { border-top: 3px solid #ff9f43; }
+#widget-vur       .grid-stack-item-content { border-top: 3px solid #48a9ff; }
+
+@media (max-width: 1000px) {
+    #smrtMeterGrid {
+        height: auto;
+        min-height: 700px;
+    }
+}
+</style>
+
+
+<script src="/vendor/gridstack/gridstack-all.js"></script>
+
+<script id="smrt-gridstack-meters-js">
+(() => {
+
+const COLORS = {
+    blue:   "#48a9ff",
+    green:  "#61d095",
+    purple: "#b48cff",
+    red:    "#ff6464",
+    orange: "#ff9f43",
+    grid:   "#343a40",
+    text:   "#8b949e"
+};
+
+const STORAGE_KEY = "smrt-meter-layout-v1";
+
+let grid = null;
+let editing = false;
+let built = false;
+let meterData = null;
+
+const DEFAULT_LAYOUT = [
+    {id:"widget-vul",      x:0, y:0, w:4, h:4},
+    {id:"widget-vector",   x:4, y:0, w:4, h:4},
+    {id:"widget-vur",      x:8, y:0, w:4, h:4},
+
+    {id:"widget-waveform", x:0, y:4, w:12, h:2},
+    {id:"widget-spectrum", x:0, y:6, w:12, h:2},
+    {id:"widget-stereo",   x:0, y:8, w:12, h:2}
+];
+
+function meterPage() {
+    return document.getElementById("meters");
+}
+
+function widget(id, title, body) {
+    return `
+    <div class="grid-stack-item"
+         id="${id}"
+         gs-id="${id}">
+      <div class="grid-stack-item-content">
+        <div class="smrt-widget ${id === "widget-vul" || id === "widget-vur" ? "smrt-vu-widget" : ""}">
+          <div class="smrt-widget-title">${title}</div>
+          ${body}
+        </div>
+      </div>
+    </div>`;
+}
+
+function build() {
+    if (built) return true;
+
+    const page = meterPage();
+    if (!page) return false;
+
+    /*
+     * Preserve the manager's existing page heading if present,
+     * but remove the old placeholder/instrument content.
+     */
+    const head = page.querySelector(".page-head");
+    const headHTML = head ? head.outerHTML : `
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Signal Analysis</div>
+          <h2>Meters</h2>
+        </div>
+      </div>`;
+
+    page.innerHTML = `
+      ${headHTML}
+
+      <div id="smrtMeterToolbar">
+        <div id="smrtMeterStatus">METER ENGINE: CONNECTING</div>
+
+        <div class="smrt-layout-buttons">
+          <button id="smrtLayoutEdit">EDIT LAYOUT</button>
+          <button id="smrtLayoutReset">RESET</button>
+        </div>
+      </div>
+
+      <div id="smrtMeterGrid" class="grid-stack">
+
+        ${widget(
+            "widget-spectrum",
+            "Spectrum • 20 Hz — 20 kHz",
+            `<canvas id="spectrumCanvas" class="smrt-canvas"></canvas>`
+        )}
+
+        ${widget(
+            "widget-waveform",
+            "Waveform • Left / Right",
+            `<canvas id="waveCanvas" class="smrt-canvas"></canvas>`
+        )}
+
+        ${widget(
+            "widget-vector",
+            "Stereo Vectorscope",
+            `<canvas id="vectorCanvas" class="smrt-canvas"></canvas>`
+        )}
+
+        ${widget(
+            "widget-stereo",
+            "Stereo / Phase",
+            `
+            <canvas id="corrCanvas" class="smrt-canvas"></canvas>
+            <div class="smrt-stereo-values">
+              <div>
+                <label>CORRELATION</label>
+                <strong id="corrValue">--</strong>
+              </div>
+              <div>
+                <label>L/R BALANCE</label>
+                <strong id="balanceValue">--</strong>
+              </div>
+            </div>`
+        )}
+
+        ${widget(
+            "widget-vul",
+            "Left VU",
+            `
+            <canvas id="vuL"></canvas>
+            <div class="smrt-readouts">
+              <span id="rmsL">RMS --</span>
+              <span id="pkL">PK --</span>
+              <span id="tpL">TP --</span>
+              <span id="crestL">CF --</span>
+            </div>`
+        )}
+
+        ${widget(
+            "widget-vur",
+            "Right VU",
+            `
+            <canvas id="vuR"></canvas>
+            <div class="smrt-readouts">
+              <span id="rmsR">RMS --</span>
+              <span id="pkR">PK --</span>
+              <span id="tpR">TP --</span>
+              <span id="crestR">CF --</span>
+            </div>`
+        )}
+
+      </div>
+    `;
+
+    const saved = loadLayout();
+
+    const layout = saved || DEFAULT_LAYOUT;
+
+    layout.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (!el) return;
+
+        el.setAttribute("gs-x", item.x);
+        el.setAttribute("gs-y", item.y);
+        el.setAttribute("gs-w", item.w);
+        el.setAttribute("gs-h", item.h);
+    });
+
+    grid = GridStack.init({
+        column: 12,
+        cellHeight: 72,
+        margin: 6,
+
+        float: true,
+        animate: true,
+
+        disableDrag: true,
+        disableResize: true,
+
+        draggable: {
+            handle: ".smrt-widget-title"
+        },
+
+        resizable: {
+            handles: "all"
+        }
+    }, "#smrtMeterGrid");
+
+    grid.on("change", saveLayout);
+    grid.on("resizestop", () => {
+        if (meterData) render(meterData);
+    });
+
+    document.getElementById("smrtLayoutEdit")
+        .addEventListener("click", toggleEdit);
+
+    document.getElementById("smrtLayoutReset")
+        .addEventListener("click", resetLayout);
+
+    built = true;
+    return true;
+}
+
+function toggleEdit() {
+    editing = !editing;
+
+    grid.enableMove(editing);
+    grid.enableResize(editing);
+
+    const root = document.getElementById("smrtMeterGrid");
+    root.classList.toggle("editing", editing);
+
+    const button = document.getElementById("smrtLayoutEdit");
+
+    button.classList.toggle("active", editing);
+    button.textContent = editing ? "LOCK LAYOUT" : "EDIT LAYOUT";
+
+    if (!editing) saveLayout();
+}
+
+function saveLayout() {
+    if (!grid) return;
+
+    const data = grid.save(false).map(n => ({
+        id: n.id || n.el?.id,
+        x: n.x,
+        y: n.y,
+        w: n.w,
+        h: n.h
+    })).filter(n => n.id);
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadLayout() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+
+        const data = JSON.parse(raw);
+
+        if (!Array.isArray(data) || !data.length)
+            return null;
+
+        return data;
+
+    } catch {
+        return null;
+    }
+}
+
+function resetLayout() {
+    localStorage.removeItem(STORAGE_KEY);
+
+    DEFAULT_LAYOUT.forEach(n => {
+        const el = document.getElementById(n.id);
+        if (el)
+            grid.update(el, {
+                x:n.x, y:n.y, w:n.w, h:n.h
+            });
+    });
+
+    saveLayout();
+
+    if (meterData)
+        requestAnimationFrame(() => render(meterData));
+}
+
+function prep(canvas) {
+    if (!canvas) return null;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+
+    const w = Math.max(1, rect.width);
+    const h = Math.max(1, rect.height);
+
+    const pw = Math.floor(w * dpr);
+    const ph = Math.floor(h * dpr);
+
+    if (canvas.width !== pw || canvas.height !== ph) {
+        canvas.width = pw;
+        canvas.height = ph;
+    }
+
+    const c = canvas.getContext("2d");
+
+    c.setTransform(dpr,0,0,dpr,0,0);
+    c.clearRect(0,0,w,h);
+
+    return [c,w,h];
+}
+
+function drawGrid(c,w,h) {
+    c.strokeStyle = COLORS.grid;
+    c.lineWidth = 1;
+
+    for (let i=1;i<8;i++) {
+        const x = w*i/8;
+        c.beginPath();
+        c.moveTo(x,0);
+        c.lineTo(x,h);
+        c.stroke();
+    }
+
+    for (let i=1;i<4;i++) {
+        const y = h*i/4;
+        c.beginPath();
+        c.moveTo(0,y);
+        c.lineTo(w,y);
+        c.stroke();
+    }
+}
+
+function drawSpectrum(d) {
+    const result = prep(document.getElementById("spectrumCanvas"));
+    if (!result || !d.spectrum) return;
+
+    const [c,w,h] = result;
+    drawGrid(c,w,h);
+
+    const draw = (index,color) => {
+        c.strokeStyle = color;
+        c.lineWidth = 1.4;
+        c.beginPath();
+
+        d.spectrum.forEach((p,i) => {
+            const f = Math.max(20,p[0]);
+            const db = Math.max(-100,Math.min(0,p[index]));
+
+            const x =
+                Math.log10(f/20) /
+                Math.log10(1000) * w;
+
+            const y = (-db/100) * h;
+
+            if (i === 0) c.moveTo(x,y);
+            else c.lineTo(x,y);
+        });
+
+        c.stroke();
+    };
+
+    draw(1,COLORS.blue);
+    draw(2,COLORS.green);
+
+    c.fillStyle = COLORS.text;
+    c.font = "10px monospace";
+
+    [20,50,100,500,1000,5000,10000,20000]
+        .forEach(f => {
+            const x =
+                Math.log10(f/20) /
+                Math.log10(1000) * w;
+
+            const label =
+                f >= 1000 ? `${f/1000}k` : `${f}`;
+
+            c.fillText(label,x+2,h-5);
+        });
+}
+
+function drawWaveform(d) {
+    const result = prep(document.getElementById("waveCanvas"));
+    if (!result || !d.waveform) return;
+
+    const [c,w,h] = result;
+    drawGrid(c,w,h);
+
+    const draw = (arr,center,color) => {
+        if (!arr?.length) return;
+
+        c.strokeStyle = color;
+        c.lineWidth = 1.2;
+        c.beginPath();
+
+        arr.forEach((v,i) => {
+            const x = i/(arr.length-1)*w;
+            const y = center - (v * 10) * (h*.20);
+
+            if (i === 0) c.moveTo(x,y);
+            else c.lineTo(x,y);
+        });
+
+        c.stroke();
+    };
+
+    draw(d.waveform.l,h*.28,COLORS.purple);
+    draw(d.waveform.r,h*.72,COLORS.orange);
+}
+
+function drawVU(id,value) {
+    const result = prep(document.getElementById(id));
+    if (!result) return;
+
+    const [c,w,h] = result;
+
+    const cx = w/2;
+    const cy = h*.92;
+    const radius = Math.min(w*.44,h*.78);
+
+    const min = -100;
+    const max = 0;
+
+    const v = Math.max(
+        min,
+        Math.min(max,Number.isFinite(value) ? value : min)
+    );
+
+    const frac = (v-min)/(max-min);
+
+    const a0 = Math.PI*1.18;
+    const a1 = Math.PI*1.82;
+    const a = a0+(a1-a0)*frac;
+
+    c.strokeStyle = "#262626";
+    c.fillStyle = "#262626";
+    c.lineWidth = 1.5;
+
+    c.beginPath();
+    c.arc(cx,cy,radius,a0,a1);
+    c.stroke();
+
+    for (let i=0;i<=10;i++) {
+        const aa = a0+(a1-a0)*i/10;
+
+        const x1 = cx+Math.cos(aa)*(radius-6);
+        const y1 = cy+Math.sin(aa)*(radius-6);
+
+        const x2 = cx+Math.cos(aa)*radius;
+        const y2 = cy+Math.sin(aa)*radius;
+
+        c.beginPath();
+        c.moveTo(x1,y1);
+        c.lineTo(x2,y2);
+        c.stroke();
+    }
+
+    c.strokeStyle = "#b22";
+    c.lineWidth = 2.2;
+
+    c.beginPath();
+    c.moveTo(cx,cy);
+    c.lineTo(
+        cx+Math.cos(a)*(radius-10),
+        cy+Math.sin(a)*(radius-10)
+    );
+    c.stroke();
+
+    c.fillStyle = "#111";
+    c.font = "11px monospace";
+    c.fillText(`${v.toFixed(1)} dB`,cx-28,cy-8);
+}
+
+function drawVector(d) {
+    const result = prep(document.getElementById("vectorCanvas"));
+    if (!result || !d.vectorscope) return;
+
+    const [c,w,h] = result;
+
+    const cx=w/2;
+    const cy=h/2;
+
+    c.strokeStyle=COLORS.grid;
+
+    c.beginPath();
+    c.moveTo(cx,0);
+    c.lineTo(cx,h);
+    c.stroke();
+
+    c.beginPath();
+    c.moveTo(0,cy);
+    c.lineTo(w,cy);
+    c.stroke();
+
+    c.fillStyle=COLORS.green;
+
+    d.vectorscope.forEach(p => {
+        const x=cx+(p[0] * 16)*w*.42;
+        const y=cy-(p[1] * 16)*h*.42;
+        c.fillRect(x,y,2,2);
+    });
+}
+
+function drawStereo(d) {
+    const result = prep(document.getElementById("corrCanvas"));
+    if (!result || !d.stereo) return;
+
+    const [c,w,h]=result;
+
+    const v=Math.max(
+        -1,
+        Math.min(1,d.stereo.correlation)
+    );
+
+    const centerY=h*.48;
+
+    c.strokeStyle=COLORS.grid;
+    c.lineWidth=2;
+
+    c.beginPath();
+    c.moveTo(12,centerY);
+    c.lineTo(w-12,centerY);
+    c.stroke();
+
+    [-1,0,1].forEach(n => {
+        const x=12+(n+1)/2*(w-24);
+
+        c.beginPath();
+        c.moveTo(x,centerY-7);
+        c.lineTo(x,centerY+7);
+        c.stroke();
+
+        c.fillStyle=COLORS.text;
+        c.font="10px monospace";
+        c.fillText(n.toString(),x-4,centerY+21);
+    });
+
+    const x=12+(v+1)/2*(w-24);
+
+    c.fillStyle=v<0 ? COLORS.red : COLORS.blue;
+
+    c.beginPath();
+    c.arc(x,centerY,6,0,Math.PI*2);
+    c.fill();
+
+    const corr=document.getElementById("corrValue");
+    const bal=document.getElementById("balanceValue");
+
+    if (corr)
+        corr.textContent=v.toFixed(3);
+
+    if (bal) {
+        const b=d.stereo.balance_db;
+
+        bal.textContent =
+            `${b>0?"+":""}${b.toFixed(2)} dB ${
+                b>0 ? "R" :
+                b<0 ? "L" : ""
+            }`;
+    }
+}
+
+function setText(id,value) {
+    const el=document.getElementById(id);
+    if (el) el.textContent=value;
+}
+
+function drawReadouts(d) {
+    setText("rmsL",`RMS ${d.rms.l.toFixed(1)}`);
+    setText("rmsR",`RMS ${d.rms.r.toFixed(1)}`);
+
+    setText("pkL",`PK ${d.peak.l.toFixed(1)}`);
+    setText("pkR",`PK ${d.peak.r.toFixed(1)}`);
+
+    setText("tpL",`TP ${d.true_peak.l.toFixed(1)}`);
+    setText("tpR",`TP ${d.true_peak.r.toFixed(1)}`);
+
+    setText("crestL",`CF ${d.crest.l.toFixed(1)}`);
+    setText("crestR",`CF ${d.crest.r.toFixed(1)}`);
+
+    drawVU("vuL",d.vu.l);
+    drawVU("vuR",d.vu.r);
+}
+
+function render(d) {
+    if (!built) return;
+
+    drawSpectrum(d);
+    drawWaveform(d);
+    drawVector(d);
+    drawStereo(d);
+    drawReadouts(d);
+
+    const status=document.getElementById("smrtMeterStatus");
+
+    if (status) {
+        status.textContent =
+            `METER ENGINE: LIVE • ${(d.rate/1000).toFixed(0)} kHz • POST DSP`;
+    }
+}
+
+async function poll() {
+    try {
+        const response=await fetch(
+            "/api/meters",
+            {cache:"no-store"}
+        );
+
+        if (!response.ok)
+            throw new Error(`HTTP ${response.status}`);
+
+        const d=await response.json();
+
+        if (d && d.rate) {
+            meterData=d;
+            render(d);
+        }
+
+    } catch (error) {
+        const status=document.getElementById("smrtMeterStatus");
+
+        if (status)
+            status.textContent="METER ENGINE: OFFLINE";
+    }
+}
+
+function start() {
+    if (!build()) {
+        setTimeout(start,250);
+        return;
+    }
+
+    poll();
+    setInterval(poll,50);
+
+    window.addEventListener("resize", () => {
+        if (meterData)
+            requestAnimationFrame(() => render(meterData));
+    });
+}
+
+start();
+
+})();
+</script>
+
+
+<style id="smrt-now-playing-style">
+
+#nowplaying {
+    overflow: auto;
+}
+
+.np-shell {
+    height: calc(100vh - 150px);
+    min-height: 610px;
+    display: grid;
+    grid-template-columns: minmax(300px, .72fr) minmax(500px, 1.6fr);
+    grid-template-rows: minmax(330px, 1fr) auto;
+    gap: 14px;
+}
+
+.np-card {
+    background: #111519;
+    border: 1px solid #30373d;
+    border-radius: 7px;
+    overflow: hidden;
+    box-shadow: inset 0 0 24px rgba(0,0,0,.28);
+}
+
+.np-art {
+    position: relative;
+    border-top: 3px solid #48a9ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(circle at center, #171d22 0%, #090c0e 72%);
+}
+
+.np-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+}
+
+.np-art-placeholder {
+    text-align: center;
+    opacity: .32;
+}
+
+.np-atom {
+    font-size: 72px;
+    line-height: 1;
+    color: #48a9ff;
+}
+
+.np-info {
+    border-top: 3px solid #61d095;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+}
+
+.np-status {
+    font-size: 10px;
+    letter-spacing: .16em;
+    color: #61d095;
+    margin-bottom: 25px;
+}
+
+.np-artist {
+    font-size: clamp(20px,2vw,30px);
+    color: #aeb7be;
+    margin-bottom: 8px;
+}
+
+.np-title {
+    font-size: clamp(30px,3.5vw,52px);
+    line-height: 1.05;
+    font-weight: 650;
+    color: #f1f3f4;
+    margin-bottom: 14px;
+}
+
+.np-album {
+    font-size: clamp(17px,1.7vw,24px);
+    color: #b48cff;
+    margin-bottom: 10px;
+}
+
+.np-summary {
+    color: #8d969d;
+    font-size: 13px;
+    letter-spacing: .04em;
+}
+
+.np-release {
+    margin-top: auto;
+    padding-top: 25px;
+    border-top: 1px solid #2c3338;
+}
+
+.np-release-title {
+    font-size: 10px;
+    letter-spacing: .15em;
+    opacity: .55;
+    margin-bottom: 10px;
+}
+
+.np-release-grid {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 12px;
+}
+
+.np-field label {
+    display: block;
+    font-size: 9px;
+    letter-spacing: .13em;
+    opacity: .45;
+    margin-bottom: 4px;
+}
+
+.np-field strong {
+    display: block;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.np-links {
+    grid-column: 1 / -1;
+    border-top: 3px solid #ff9f43;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.np-link-title {
+    margin-right: auto;
+    font-size: 10px;
+    letter-spacing: .15em;
+    opacity: .55;
+}
+
+.np-link {
+    display: none;
+    padding: 7px 13px;
+    border: 1px solid #3a4248;
+    border-radius: 5px;
+    color: #dce1e4;
+    text-decoration: none;
+    font-size: 10px;
+    letter-spacing: .08em;
+}
+
+.np-link:hover {
+    border-color: #48a9ff;
+    color: #48a9ff;
+}
+
+.np-progress {
+    margin-top: 24px;
+}
+
+.np-progress-track {
+    height: 3px;
+    background: #30373d;
+    position: relative;
+}
+
+.np-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #48a9ff;
+}
+
+.np-time {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-family: monospace;
+    font-size: 10px;
+    opacity: .55;
+}
+
+@media (max-width: 950px) {
+    .np-shell {
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: 350px auto auto;
+    }
+
+    .np-links {
+        grid-column: auto;
+    }
+
+    .np-release-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+</style>
+
+
+<script id="smrt-now-playing-js">
+(() => {
+
+let built = false;
+
+function page() {
+    return document.getElementById("nowplaying");
+}
+
+function value(v, fallback="—") {
+    return v === null || v === undefined || v === ""
+        ? fallback : v;
+}
+
+function time(seconds) {
+    if (!Number.isFinite(seconds))
+        return "--:--";
+
+    seconds = Math.max(0,Math.floor(seconds));
+
+    const m = Math.floor(seconds/60);
+    const s = seconds%60;
+
+    return `${m}:${String(s).padStart(2,"0")}`;
+}
+
+function build() {
+    if (built) return true;
+
+    const root = page();
+    if (!root) return false;
+
+    const head = root.querySelector(".page-head");
+
+    const headHTML = head ? head.outerHTML : `
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Music Intelligence</div>
+          <h2>Now Playing</h2>
+        </div>
+      </div>`;
+
+    root.innerHTML = `
+      ${headHTML}
+
+      <div class="np-shell">
+
+        <div class="np-card np-art">
+          <img id="npArtwork" alt="Album artwork">
+
+          <div id="npArtworkPlaceholder"
+               class="np-art-placeholder">
+            <div class="np-atom">◎</div>
+            <div>AWAITING IDENTIFICATION</div>
+          </div>
+        </div>
+
+        <div class="np-card np-info">
+
+          <div id="npStatus" class="np-status">
+            WAITING FOR MUSIC
+          </div>
+
+          <div id="npArtist" class="np-artist">Unknown Artist</div>
+          <div id="npTitle" class="np-title">No Track Identified</div>
+          <div id="npAlbum" class="np-album">—</div>
+          <div id="npSummary" class="np-summary">—</div>
+
+          <div class="np-progress">
+            <div class="np-progress-track">
+              <div id="npProgress"
+                   class="np-progress-fill"></div>
+            </div>
+
+            <div class="np-time">
+              <span id="npPosition">--:--</span>
+              <span id="npDuration">--:--</span>
+            </div>
+          </div>
+
+          <div class="np-release">
+            <div class="np-release-title">RELEASE</div>
+
+            <div class="np-release-grid">
+
+              <div class="np-field">
+                <label>FORMAT</label>
+                <strong id="npFormat">—</strong>
+              </div>
+
+              <div class="np-field">
+                <label>COUNTRY</label>
+                <strong id="npCountry">—</strong>
+              </div>
+
+              <div class="np-field">
+                <label>LABEL</label>
+                <strong id="npLabel">—</strong>
+              </div>
+
+              <div class="np-field">
+                <label>CATALOG</label>
+                <strong id="npCatalog">—</strong>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <div class="np-card np-links">
+
+          <span class="np-link-title">
+            DATABASE REFERENCES
+          </span>
+
+          <a id="npDiscogs"
+             class="np-link"
+             target="_blank"
+             rel="noopener">
+             DISCOGS ↗
+          </a>
+
+          <a id="npMusicBrainz"
+             class="np-link"
+             target="_blank"
+             rel="noopener">
+             MUSICBRAINZ ↗
+          </a>
+
+          <a id="npWikipedia"
+             class="np-link"
+             target="_blank"
+             rel="noopener">
+             WIKIPEDIA ↗
+          </a>
+
+        </div>
+
+      </div>
+    `;
+
+    built = true;
+    return true;
+}
+
+function text(id,v) {
+    const el=document.getElementById(id);
+    if (el) el.textContent=value(v);
+}
+
+function link(id,url) {
+    const el=document.getElementById(id);
+    if (!el) return;
+
+    if (url) {
+        el.href=url;
+        el.style.display="inline-block";
+    } else {
+        el.removeAttribute("href");
+        el.style.display="none";
+    }
+}
+
+function render(d) {
+    if (!built) return;
+
+    text("npArtist",d.artist || "Unknown Artist");
+    text("npTitle",d.title || "No Track Identified");
+    text("npAlbum",d.album);
+
+    const summary = [
+        d.year,
+        ...(Array.isArray(d.genres) ? d.genres : [])
+    ].filter(Boolean).join(" • ");
+
+    text("npSummary",summary);
+
+    const release=d.release || {};
+
+    text("npFormat",release.format);
+    text("npCountry",release.country);
+    text("npLabel",release.label);
+    text("npCatalog",release.catalog_number);
+
+    const identification=d.identification || {};
+
+    const status=document.getElementById("npStatus");
+
+    if (status) {
+        if (d.identified) {
+            let t="IDENTIFIED";
+
+            if (identification.method)
+                t += ` • ${String(identification.method).toUpperCase()}`;
+
+            if (Number.isFinite(identification.confidence))
+                t += ` • ${Math.round(identification.confidence*100)}%`;
+
+            status.textContent=t;
+        } else {
+            status.textContent =
+                d.state === "playing"
+                    ? "LISTENING • IDENTIFYING"
+                    : "WAITING FOR MUSIC";
+        }
+    }
+
+    const artwork=document.getElementById("npArtwork");
+    const placeholder=document.getElementById("npArtworkPlaceholder");
+
+    if (d.artwork) {
+        artwork.src=d.artwork;
+        artwork.style.display="block";
+        placeholder.style.display="none";
+    } else {
+        artwork.removeAttribute("src");
+        artwork.style.display="none";
+        placeholder.style.display="block";
+    }
+
+    const links=d.links || {};
+
+    link("npDiscogs",links.discogs);
+    link("npMusicBrainz",links.musicbrainz);
+    link("npWikipedia",links.wikipedia);
+
+    const position=Number(d.position);
+    const duration=Number(d.duration);
+
+    text(
+        "npPosition",
+        Number.isFinite(position) ? time(position) : "--:--"
+    );
+
+    text(
+        "npDuration",
+        Number.isFinite(duration) ? time(duration) : "--:--"
+    );
+
+    const progress=document.getElementById("npProgress");
+
+    if (progress) {
+        const pct =
+            Number.isFinite(position) &&
+            Number.isFinite(duration) &&
+            duration > 0
+                ? Math.max(0,Math.min(100,(position/duration)*100))
+                : 0;
+
+        progress.style.width=`${pct}%`;
+    }
+}
+
+async function poll() {
+    try {
+        const r=await fetch(
+            "/api/now-playing",
+            {cache:"no-store"}
+        );
+
+        if (!r.ok)
+            throw new Error(`HTTP ${r.status}`);
+
+        render(await r.json());
+
+    } catch {
+        const status=document.getElementById("npStatus");
+
+        if (status)
+            status.textContent="METADATA ENGINE OFFLINE";
+    }
+}
+
+function start() {
+    if (!build()) {
+        setTimeout(start,250);
+        return;
+    }
+
+    poll();
+    setInterval(poll,1000);
+}
+
+start();
+
+})();
+</script>
+
+
+<style id="smrt-visualizer-style">
+
+#visualizer {
+    overflow: hidden;
+}
+
+.smrt-viz-shell {
+    height: calc(100vh - 145px);
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.smrt-viz-toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+
+    background: #111519;
+    border: 1px solid #30373d;
+    border-top: 3px solid #b48cff;
+    border-radius: 7px;
+}
+
+.smrt-viz-toolbar label {
+    font-size: 9px;
+    letter-spacing: .14em;
+    opacity: .55;
+}
+
+.smrt-viz-toolbar select,
+.smrt-viz-toolbar button {
+    background: #171c20;
+    color: #dce1e4;
+    border: 1px solid #3b4248;
+    border-radius: 5px;
+    padding: 6px 10px;
+}
+
+.smrt-viz-toolbar button {
+    cursor: pointer;
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: .08em;
+}
+
+.smrt-viz-toolbar button:hover {
+    border-color: #48a9ff;
+}
+
+.smrt-viz-status {
+    font-family: monospace;
+    font-size: 10px;
+    color: #61d095;
+}
+
+.smrt-viz-frame {
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+
+    background: #05070a;
+    border: 1px solid #30373d;
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.smrt-viz-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #05070a;
+}
+
+</style>
+
+
+<script id="smrt-visualizer-ui">
+(() => {
+
+let built = false;
+
+function build() {
+
+    if (built)
+        return true;
+
+    const page =
+        document.getElementById("visualizer");
+
+    if (!page)
+        return false;
+
+    const head =
+        page.querySelector(".page-head");
+
+    const headHTML = head
+        ? head.outerHTML
+        : `
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Reactive Graphics</div>
+              <h2>Visualizer</h2>
+            </div>
+          </div>`;
+
+    page.innerHTML = `
+      ${headHTML}
+
+      <div class="smrt-viz-shell">
+
+        <div class="smrt-viz-toolbar">
+
+          <label for="smrtVizSelect">ENGINE</label>
+
+          <select id="smrtVizSelect">
+            <option value="Spectrum">Spectrum</option>
+            <option value="Gravity">Gravity</option>
+          </select>
+
+          <span
+            class="smrt-viz-status"
+            id="smrtVizStatus">
+            THREE.JS • LIVE
+          </span>
+
+          <button id="smrtVizOpen">
+            OPEN DISPLAY ↗
+          </button>
+
+        </div>
+
+        <div class="smrt-viz-frame">
+          <iframe
+            id="smrtVizFrame"
+            src="/visualizer-engine/"
+            title="SMRT DSP Visualizer">
+          </iframe>
+        </div>
+
+      </div>
+    `;
+
+    const vizFrame =
+        document.getElementById("smrtVizFrame");
+
+    const vizSelect =
+        document.getElementById("smrtVizSelect");
+
+    const vizStatus =
+        document.getElementById("smrtVizStatus");
+
+    /*
+     * SMRT VISUALIZER REGISTRY
+     *
+     * Every visualizer is a peer.
+     * The manager UI does not care how an engine is implemented.
+     *
+     * Future engines such as MilkDrop, Butterchurn and WaveScope
+     * register here and automatically inherit selection,
+     * persistence, iframe rendering and Open Display behavior.
+     */
+    const visualizerRegistry = {
+        Spectrum: {
+            label: "Spectrum",
+            src: "/visualizer-engine/",
+            status: "THREE.JS • LIVE",
+            presets: false
+        },
+
+        Gravity: {
+            label: "Gravity",
+            src: "/gravity/",
+            status: "QUANTUM • GRAVITY",
+            presets: false
+        }
+    };
+
+    function getSelectedVisualizer() {
+        return visualizerRegistry[vizSelect.value] || null;
+    }
+
+    function renderVisualizer(name) {
+
+        const config = visualizerRegistry[name];
+
+        if (!config)
+            return;
+
+        vizSelect.value = name;
+        vizFrame.src = config.src;
+        vizStatus.textContent = config.status;
+    }
+
+    async function saveVisualizer(name) {
+        try {
+            await fetch("/api/visualizer-state", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    visualizer: name
+                })
+            });
+        } catch (_) {}
+    }
+
+    vizSelect.addEventListener("change", async () => {
+
+        const selected = vizSelect.value;
+
+        renderVisualizer(selected);
+        await saveVisualizer(selected);
+    });
+
+    const vizOpen =
+        document.getElementById("smrtVizOpen");
+
+    vizOpen.addEventListener("click", () => {
+
+        const config = getSelectedVisualizer();
+
+        if (!config)
+            return;
+
+        window.open(
+            config.src,
+            "_blank",
+            "noopener,noreferrer"
+        );
+    });
+
+    /*
+     * Restore the persisted visualizer.
+     * The selected engine therefore survives manager reloads.
+     */
+    fetch("/api/visualizer-state")
+        .then(response => response.json())
+        .then(state => {
+
+            const selected =
+                state.visualizer ||
+                state.selected ||
+                state.engine;
+
+            if (visualizerRegistry[selected])
+                renderVisualizer(selected);
+        })
+        .catch(() => {});
+
+    const vizDiagnostic =
+        document.createElement("div");
+
+    vizDiagnostic.id = "smrtVizDiagnostic";
+    vizDiagnostic.style.cssText =
+        "font:11px monospace;color:#61d095;" +
+        "padding:4px 8px;white-space:pre-wrap;";
+
+    document
+        .querySelector(".smrt-viz-toolbar")
+        .appendChild(vizDiagnostic);
+
+    vizFrame.addEventListener("load", () => {
+        try {
+            const doc = vizFrame.contentDocument;
+            const win = vizFrame.contentWindow;
+
+            vizDiagnostic.textContent =
+                "IFRAME LOADED | " +
+                win.location.href +
+                " | TITLE: " +
+                doc.title +
+                " | BODY: " +
+                doc.body.innerText
+                    .replace(/\s+/g, " ")
+                    .slice(0, 100) +
+                " | SIZE: " +
+                vizFrame.clientWidth +
+                "x" +
+                vizFrame.clientHeight;
+
+        } catch (e) {
+            vizDiagnostic.textContent =
+                "IFRAME ERROR: " + e;
+        }
+    });
+
+    built = true;
+
+    return true;
+}
+
+function start() {
+
+    if (!build()) {
+        setTimeout(start, 250);
+        return;
+    }
+}
+
+start();
+
+})();
+</script>
+
+</body>
+</html>
+
+<style>
+.preset.selected {
+    background: #3a4046;
+    color: #ffffff;
+    font-weight: 700;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 2px currentColor, 0 8px 20px rgba(0,0,0,.35);
+}
+
+.preset:nth-child(1).selected { color: var(--blue); }
+.preset:nth-child(2).selected { color: var(--green); }
+.preset:nth-child(3).selected { color: var(--purple); }
+.preset:nth-child(4).selected { color: var(--red); }
+.preset:nth-child(5).selected { color: var(--orange); }
+</style>
+
+<script>
+const headerVoicing = document.querySelector(".status-voice .status-value");
+
+let presetButtons = [];
+let voicingCatalog = {};
+
+function displayPreset(preset) {
+    presetButtons.forEach(button => {
+        button.classList.toggle("selected", button.dataset.preset === preset);
+    });
+
+    if (headerVoicing) {
+        const v = voicingCatalog[preset];
+        headerVoicing.textContent = v ? v.label : String(preset).toUpperCase();
+    }
+}
+
+let requestedPreset = null;
+let presetWorkerRunning = false;
+
+async function setPreset(preset) {
+    // UI always reflects the user's latest selection immediately.
+    requestedPreset = preset;
+    displayPreset(preset);
+
+    if (presetWorkerRunning) return;
+    presetWorkerRunning = true;
+
+    try {
+        while (requestedPreset !== null) {
+            const target = requestedPreset;
+            requestedPreset = null;
+
+            const response = await fetch(
+                "/api/voicing/" + encodeURIComponent(target),
+                { method: "POST" }
+            );
+
+            if (!response.ok) throw new Error("HTTP " + response.status);
+
+            // If another button was clicked while this request ran,
+            // loop immediately and apply the newest selection.
+        }
+    } catch (error) {
+        console.error("Preset change error:", error);
+    } finally {
+        presetWorkerRunning = false;
+
+        // Latest user selection remains authoritative in the UI.
+        if (requestedPreset !== null) {
+            setPreset(requestedPreset);
+        }
+    }
+}
+
+function renderVoicings() {
+    const container = document.getElementById("voicingLibrary");
+    if (!container) return;
+
+    const families = {};
+    Object.entries(voicingCatalog).forEach(([id, v]) => {
+        const family = v.family || "Other";
+        (families[family] ||= []).push([id, v]);
+    });
+
+    container.innerHTML = "";
+
+    Object.entries(families).forEach(([family, entries]) => {
+        const group = document.createElement("div");
+        group.className = "voicing-family";
+
+        const title = document.createElement("div");
+        title.className = "voicing-family-title";
+        title.textContent = family;
+        group.appendChild(title);
+
+        const buttons = document.createElement("div");
+        buttons.className = "voicing-family-buttons";
+
+        entries.forEach(([id, v]) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "preset-button";
+            button.dataset.preset = id;
+            button.textContent = v.label || id.toUpperCase();
+            button.title = v.description || "";
+            button.addEventListener("click", () => setPreset(id));
+            buttons.appendChild(button);
+        });
+
+        group.appendChild(buttons);
+        container.appendChild(group);
+    });
+
+    presetButtons = Array.from(container.querySelectorAll("[data-preset]"));
+}
+
+async function loadVoicings() {
+    try {
+        const response = await fetch("/api/voicings", { cache: "no-store" });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        const data = await response.json();
+        voicingCatalog = data.voicings || {};
+        renderVoicings();
+        displayPreset(data.preset);
+    } catch (error) {
+        console.error("Voicing catalog error:", error);
+    }
+}
+
+async function readPreset() {
+    try {
+        const response = await fetch("/api/voicing", { cache: "no-store" });
+        if (!response.ok) return;
+        const data = await response.json();
+        displayPreset(data.preset);
+    } catch (error) {
+        console.error("Preset status error:", error);
+    }
+}
+
+loadVoicings();
+</script>
+
+
+
+
+
+
+
+<style id="smrt-viz-iframe-sizing-fix">
+
+.smrt-viz-frame {
+    display: grid !important;
+    position: relative !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+.smrt-viz-frame iframe {
+    position: relative !important;
+    inset: auto !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    align-self: stretch !important;
+    justify-self: stretch !important;
+}
+
+</style>
+
+<style id="smrt-system-ui">
+#system .system-dashboard {
+    display:grid;
+    grid-template-columns:repeat(12,minmax(0,1fr));
+    gap:12px;
+    margin-top:18px;
+}
+.system-card {
+    grid-column:span 4;
+    background:#0b0e12;
+    border:1px solid #242a32;
+    border-top:3px solid var(--card-accent,#61d095);
+    padding:16px;
+    min-width:0;
+}
+.system-card.wide { grid-column:span 6; }
+.system-card.full { grid-column:1/-1; }
+
+.system-title {
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--card-accent,#61d095);
+    margin-bottom:14px;
+}
+.system-row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    min-height:29px;
+    border-bottom:1px solid #171c22;
+    font-size:13px;
+}
+.system-row:last-child { border-bottom:0; }
+.system-label { color:#87919d; }
+.system-value {
+    color:#e6ebef;
+    font-family:monospace;
+    text-align:right;
+}
+.system-state {
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+}
+.system-dot {
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#69717b;
+}
+.system-dot.ok { background:#61d095; }
+.system-dot.warn { background:#ed9c3b; }
+.system-dot.bad { background:#e25757; }
+
+.system-services {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:0 24px;
+}
+.system-usb {
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    color:#87919d;
+    font:11px/1.5 monospace;
+    max-height:120px;
+    overflow:auto;
+}
+@media(max-width:1000px) {
+    .system-card,
+    .system-card.wide { grid-column:span 6; }
+    .system-services { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+</style>
+
+<script id="smrt-system-ui-script">
+(() => {
+    const page = document.getElementById("system");
+    if (!page) return;
+
+    const existing = page.querySelector(".system-dashboard");
+    if (existing) existing.remove();
+
+    const dashboard = document.createElement("div");
+    dashboard.className = "system-dashboard";
+    dashboard.innerHTML = `
+      <section class="system-card wide" style="--card-accent:#4da3ff">
+        <div class="system-title">Raspberry Pi</div>
+        <div id="sysPi"></div>
+      </section>
+
+      <section class="system-card wide" style="--card-accent:#61d095">
+        <div class="system-title">DSP Engine</div>
+        <div id="sysAudio"></div>
+      </section>
+
+      <section class="system-card" style="--card-accent:#9b72e8">
+        <div class="system-title">Power / Thermal</div>
+        <div id="sysThermal"></div>
+      </section>
+
+      <section class="system-card" style="--card-accent:#e25757">
+        <div class="system-title">USB Audio</div>
+        <div id="sysUsb"></div>
+      </section>
+
+      <section class="system-card" style="--card-accent:#ed9c3b">
+        <div class="system-title">System Load</div>
+        <div id="sysLoad"></div>
+      </section>
+
+      <section class="system-card full" style="--card-accent:#61d095">
+        <div class="system-title">Services</div>
+        <div id="sysServices" class="system-services"></div>
+      </section>
+
+      <section class="system-card full" style="--card-accent:#4da3ff">
+        <div class="system-title">USB Bus</div>
+        <div id="sysUsbBus" class="system-usb"></div>
+      </section>
+    `;
+
+    page.appendChild(dashboard);
+
+    const esc = v => String(v ?? "—")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+
+    const row = (label,value) =>
+        `<div class="system-row">
+           <span class="system-label">${esc(label)}</span>
+           <span class="system-value">${esc(value)}</span>
+         </div>`;
+
+    const state = (label,value,override=null) => {
+        const v = String(value ?? "unknown");
+        let cls = override ||
+            (["active","complete"].includes(v) ? "ok" :
+             ["inactive","waiting"].includes(v) ? "warn" : "bad");
+
+        return `<div class="system-row">
+          <span class="system-label">${esc(label)}</span>
+          <span class="system-value system-state">
+            <span class="system-dot ${cls}"></span>${esc(v.toUpperCase())}
+          </span>
+        </div>`;
+    };
+
+    const gb = n => n ? (n / 1073741824).toFixed(2) : "0.00";
+
+    async function updateSystem() {
+        try {
+            const r = await fetch("/api/system", {cache:"no-store"});
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            const d = await r.json();
+
+            const p = d.pi;
+            const a = d.audio;
+            const pw = a.pipewire;
+            const t = p.throttle;
+            const mem = p.memory;
+
+            document.getElementById("sysPi").innerHTML =
+                row("Model", p.model) +
+                row("Kernel", p.kernel) +
+                row("CPU Clock", `${p.cpu_mhz.toFixed(0)} MHz`) +
+                row("Core Clock", `${p.core_mhz.toFixed(0)} MHz`) +
+                row("Uptime", p.uptime.human);
+
+            document.getElementById("sysAudio").innerHTML =
+                state("CamillaDSP", a.camilladsp) +
+                state("PipeWire", pw.pipewire) +
+                state("WirePlumber", pw.wireplumber) +
+                state("Saturator", a.saturator) +
+                state("Routing", a.routing) +
+                state("Meter Engine", a.meter) +
+                row("Graph Rate", `${(pw.rate/1000).toFixed(1)} kHz`) +
+                row("Quantum", `${pw.quantum} frames`) +
+                row("Voicing", String(a.preset).toUpperCase());
+
+            const throttleNow =
+                t.undervoltage_now ||
+                t.frequency_capped_now ||
+                t.throttled_now ||
+                t.soft_temp_limit_now;
+
+            const throttlePast =
+                t.undervoltage_occurred ||
+                t.frequency_cap_occurred ||
+                t.throttling_occurred ||
+                t.soft_temp_limit_occurred;
+
+            document.getElementById("sysThermal").innerHTML =
+                row("Temperature", `${p.temperature_c.toFixed(1)} °C`) +
+                row("Core Voltage", `${p.core_voltage.toFixed(3)} V`) +
+                state("Current Throttle",
+                    throttleNow ? "warning" : "normal",
+                    throttleNow ? "bad" : "ok") +
+                state("Throttle History",
+                    throttlePast ? "event recorded" : "clean",
+                    throttlePast ? "warn" : "ok") +
+                row("Firmware State", t.raw);
+
+            document.getElementById("sysUsb").innerHTML =
+                state("WiiM Ultra",
+                    d.usb.wiim_detected ? "connected" : "waiting for UAC2",
+                    d.usb.wiim_detected ? "ok" : "warn") +
+                state("Topping D90",
+                    d.usb.d90_detected ? "connected" : "not connected",
+                    d.usb.d90_detected ? "ok" : "warn");
+
+            document.getElementById("sysLoad").innerHTML =
+                row("Load 1m", p.load[0].toFixed(2)) +
+                row("Load 5m", p.load[1].toFixed(2)) +
+                row("Load 15m", p.load[2].toFixed(2)) +
+                row("RAM Used", `${gb(mem.used_bytes)} GB`) +
+                row("RAM Available", `${gb(mem.available_bytes)} GB`) +
+                row("RAM Total", `${gb(mem.total_bytes)} GB`);
+
+            const names = {
+                camilladsp:"CamillaDSP",
+                dsp_saturator:"DSP Saturator",
+                dsp_routing:"DSP Routing",
+                dsp_meter:"DSP Meter",
+                preset_restore:"Preset Restore",
+                wpwgraph_web:"wpwgraph Web",
+                wpwgraph_reverb:"wpwgraph Reverb",
+                wpwgraph_watch:"wpwgraph Watch",
+                manager:"SMRT Manager",
+                pipewire:"PipeWire",
+                wireplumber:"WirePlumber"
+            };
+
+            document.getElementById("sysServices").innerHTML =
+                Object.entries(d.services)
+                    .map(([k,v]) => state(names[k] || k,v))
+                    .join("");
+
+            document.getElementById("sysUsbBus").textContent =
+                d.usb.devices.length
+                    ? d.usb.devices.join("\n")
+                    : "No USB devices reported.";
+
+        } catch (e) {
+            console.error("System telemetry:", e);
+        }
+    }
+
+    updateSystem();
+    setInterval(updateSystem, 2000);
+})();
+</script>
+
+<style id="smrt-system-controls">
+.system-controls {
+    grid-column:1/-1;
+    background:#0b0e12;
+    border:1px solid #242a32;
+    border-top:3px solid #9b72e8;
+    padding:16px;
+}
+
+.system-control-grid {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+}
+
+.system-control {
+    background:#080b0f;
+    border:1px solid #20262e;
+    padding:14px;
+}
+
+.system-control-name {
+    color:#e6ebef;
+    font-size:13px;
+    letter-spacing:.08em;
+    margin-bottom:5px;
+}
+
+.system-control-description {
+    color:#737e89;
+    font-size:11px;
+    line-height:1.4;
+    min-height:32px;
+    margin-bottom:12px;
+}
+
+.system-control-button {
+    width:100%;
+    border:1px solid #39424d;
+    background:#11161c;
+    color:#dce3e8;
+    padding:9px 12px;
+    cursor:pointer;
+    font:11px monospace;
+    letter-spacing:.10em;
+    transition:.15s;
+}
+
+.system-control-button:hover {
+    border-color:#9b72e8;
+    background:#181d25;
+}
+
+.system-control-button:disabled {
+    opacity:.45;
+    cursor:wait;
+}
+
+.system-control-button.success {
+    border-color:#61d095;
+    color:#61d095;
+}
+
+.system-control-button.failure {
+    border-color:#e25757;
+    color:#e25757;
+}
+
+.system-control-status {
+    margin-top:12px;
+    min-height:18px;
+    color:#87919d;
+    font:11px monospace;
+}
+
+@media(max-width:900px) {
+    .system-control-grid {
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+<script id="smrt-system-controls-script">
+(() => {
+    const dashboard = document.querySelector("#system .system-dashboard");
+    if (!dashboard) return;
+
+    const controls = document.createElement("section");
+    controls.className = "system-controls";
+
+    controls.innerHTML = `
+      <div class="system-title">System Controls</div>
+
+      <div class="system-control-grid">
+
+        <div class="system-control">
+          <div class="system-control-name">AUDIO ENGINE</div>
+          <div class="system-control-description">
+            Restart CamillaDSP, voicing plugin, routing and meter engine.
+          </div>
+          <button class="system-control-button"
+                  data-system-action="restart-audio">
+            RESTART AUDIO
+          </button>
+        </div>
+
+        <div class="system-control">
+          <div class="system-control-name">PIPEWIRE</div>
+          <div class="system-control-description">
+            Restart the PipeWire audio graph and WirePlumber.
+          </div>
+          <button class="system-control-button"
+                  data-system-action="restart-pipewire">
+            RESTART PIPEWIRE
+          </button>
+        </div>
+
+        <div class="system-control">
+          <div class="system-control-name">WEB STACK</div>
+          <div class="system-control-description">
+            Restart CamillaGUI and the wpwgraph web services.
+          </div>
+          <button class="system-control-button"
+                  data-system-action="restart-web">
+            RESTART WEB SERVICES
+          </button>
+        </div>
+
+      </div>
+
+      <div id="systemControlStatus"
+           class="system-control-status">
+        READY
+      </div>
+    `;
+
+    dashboard.appendChild(controls);
+
+    async function performAction(button) {
+        const action = button.dataset.systemAction;
+        const original = button.textContent;
+
+        button.disabled = true;
+        button.classList.remove("success","failure");
+        button.textContent = "WORKING…";
+
+        const status =
+            document.getElementById("systemControlStatus");
+
+        status.textContent =
+            `EXECUTING ${action.toUpperCase()}…`;
+
+        try {
+            const response = await fetch(
+                `/api/system/action/${action}`,
+                {
+                    method:"POST",
+                    cache:"no-store"
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success)
+                throw new Error(
+                    result.error || `HTTP ${response.status}`
+                );
+
+            button.classList.add("success");
+            button.textContent = "COMPLETE";
+            status.textContent =
+                `${action.toUpperCase()} COMPLETE`;
+
+            setTimeout(() => {
+                button.classList.remove("success");
+                button.textContent = original;
+                button.disabled = false;
+            }, 1800);
+
+        } catch (error) {
+            button.classList.add("failure");
+            button.textContent = "FAILED";
+            status.textContent =
+                `${action.toUpperCase()} FAILED: ${error.message}`;
+
+            setTimeout(() => {
+                button.classList.remove("failure");
+                button.textContent = original;
+                button.disabled = false;
+            }, 3000);
+        }
+    }
+
+    document
+      .querySelectorAll("[data-system-action]")
+      .forEach(button => {
+          button.addEventListener(
+              "click",
+              () => performAction(button)
+          );
+      });
+})();
+</script>
+
+<style id="smrt-backup-controls">
+.system-backup-panel {
+    grid-column:1/-1;
+    background:#0b0e12;
+    border:1px solid #242a32;
+    border-top:3px solid #4da3ff;
+    padding:16px;
+}
+
+.system-backup-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.system-backup-section {
+    background:#080b0f;
+    border:1px solid #20262e;
+    padding:14px;
+}
+
+.system-backup-actions {
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
+.system-backup-actions .system-control-button {
+    width:auto;
+    flex:1;
+}
+
+.system-backup-meta {
+    color:#87919d;
+    font:11px monospace;
+    margin-top:8px;
+}
+
+@media(max-width:900px) {
+    .system-backup-grid {
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+<script id="smrt-backup-controls-script">
+(() => {
+    const dashboard =
+        document.querySelector("#system .system-dashboard");
+
+    if (!dashboard) return;
+
+    const panel = document.createElement("section");
+    panel.className = "system-backup-panel";
+
+    panel.innerHTML = `
+      <div class="system-title">Configuration</div>
+
+      <div class="system-backup-grid">
+
+        <div class="system-backup-section">
+          <div class="system-control-name">
+            LOCAL STATE
+          </div>
+
+          <div class="system-control-description">
+            Save a known-good configuration directly on this DSP.
+          </div>
+
+          <div id="smrtLocalState"
+               class="system-backup-meta">
+            CHECKING…
+          </div>
+
+          <div class="system-backup-actions">
+            <button id="smrtSaveState"
+                    class="system-control-button">
+              SAVE STATE
+            </button>
+
+            <button id="smrtRestoreState"
+                    class="system-control-button"
+                    disabled
+                    title="Restore support is installed next">
+              RESTORE STATE
+            </button>
+          </div>
+        </div>
+
+        <div class="system-backup-section">
+          <div class="system-control-name">
+            PORTABLE BACKUP
+          </div>
+
+          <div class="system-control-description">
+            Create a portable SMRT DSP configuration archive.
+          </div>
+
+          <div class="system-backup-meta">
+            SMRT DSP Backup • ZIP
+          </div>
+
+          <div class="system-backup-actions">
+            <button id="smrtDownloadBackup"
+                    class="system-control-button">
+              CREATE BACKUP
+            </button>
+
+            <button id="smrtRestoreBackup"
+                    class="system-control-button"
+                    disabled
+                    title="Browser upload support is installed next">
+              RESTORE BACKUP
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="smrtBackupStatus"
+           class="system-control-status">
+        READY
+      </div>
+    `;
+
+    dashboard.appendChild(panel);
+
+    const status =
+        document.getElementById("smrtBackupStatus");
+
+    async function refreshBackupStatus() {
+        try {
+            const r = await fetch(
+                "/api/system/backup/status",
+                {cache:"no-store"}
+            );
+
+            const d = await r.json();
+
+            document.getElementById(
+                "smrtLocalState"
+            ).textContent =
+                d.exists
+                    ? `LAST SAVED: ${new Date(
+                        d.created
+                      ).toLocaleString()}`
+                    : "NO LOCAL STATE SAVED";
+
+        } catch {
+            document.getElementById(
+                "smrtLocalState"
+            ).textContent = "STATUS UNAVAILABLE";
+        }
+    }
+
+    document.getElementById(
+        "smrtSaveState"
+    ).addEventListener("click", async e => {
+
+        const button = e.currentTarget;
+        button.disabled = true;
+        button.textContent = "SAVING…";
+        status.textContent = "SAVING LOCAL STATE…";
+
+        try {
+            const r = await fetch(
+                "/api/system/backup/save",
+                {method:"POST"}
+            );
+
+            const d = await r.json();
+
+            if (!r.ok || !d.success)
+                throw new Error(d.error || `HTTP ${r.status}`);
+
+            button.classList.add("success");
+            button.textContent = "SAVED";
+            status.textContent =
+                "LOCAL STATE SAVED";
+
+            await refreshBackupStatus();
+
+        } catch (err) {
+            button.classList.add("failure");
+            button.textContent = "FAILED";
+            status.textContent =
+                `SAVE FAILED: ${err.message}`;
+        }
+
+        setTimeout(() => {
+            button.disabled = false;
+            button.classList.remove(
+                "success","failure"
+            );
+            button.textContent = "SAVE STATE";
+        }, 1800);
+    });
+
+    document.getElementById(
+        "smrtDownloadBackup"
+    ).addEventListener("click", () => {
+        status.textContent =
+            "CREATING PORTABLE BACKUP…";
+
+        window.location.href =
+            "/api/system/backup/download";
+
+        setTimeout(() => {
+            status.textContent =
+                "BACKUP DOWNLOAD REQUESTED";
+        }, 500);
+    });
+
+    refreshBackupStatus();
+})();
+</script>
+
+<script id="smrt-local-restore-ui">
+(() => {
+    const button = document.getElementById("smrtRestoreState");
+    const status = document.getElementById("smrtBackupStatus");
+
+    if (!button || !status) return;
+
+    button.disabled = false;
+    button.title = "Restore the locally saved known-good state";
+
+    button.addEventListener("click", async () => {
+        const confirmed = window.confirm(
+            "Restore the locally saved SMRT DSP state?\n\n" +
+            "The current configuration will first be saved as an " +
+            "emergency pre-restore snapshot. Audio services will restart."
+        );
+
+        if (!confirmed) return;
+
+        button.disabled = true;
+        button.textContent = "RESTORING…";
+        status.textContent =
+            "CREATING SAFETY SNAPSHOT AND RESTORING LOCAL STATE…";
+
+        try {
+            const response = await fetch(
+                "/api/system/backup/restore-local",
+                {
+                    method: "POST",
+                    cache: "no-store"
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.error ||
+                    result.service_error ||
+                    `HTTP ${response.status}`
+                );
+            }
+
+            button.classList.add("success");
+            button.textContent = "RESTORED";
+
+            status.textContent =
+                "LOCAL STATE RESTORED • SAFETY SNAPSHOT: " +
+                result.emergency_snapshot;
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1800);
+
+        } catch (error) {
+            button.classList.add("failure");
+            button.textContent = "FAILED";
+            button.disabled = false;
+
+            status.textContent =
+                "RESTORE FAILED: " + error.message;
+        }
+    });
+})();
+</script>
+
+<script id="smrt-upload-restore-ui">
+(() => {
+    const button =
+        document.getElementById("smrtRestoreBackup");
+
+    const status =
+        document.getElementById("smrtBackupStatus");
+
+    if (!button || !status) return;
+
+    const picker = document.createElement("input");
+
+    picker.type = "file";
+    picker.accept = ".zip,application/zip";
+    picker.style.display = "none";
+
+    document.body.appendChild(picker);
+
+    button.disabled = false;
+    button.title =
+        "Upload and restore a SMRT DSP backup";
+
+    button.addEventListener("click", () => {
+        picker.value = "";
+        picker.click();
+    });
+
+    picker.addEventListener("change", async () => {
+        const file = picker.files?.[0];
+
+        if (!file) return;
+
+        const confirmed = window.confirm(
+            "Restore this SMRT DSP backup?\n\n" +
+            file.name + "\n\n" +
+            "The archive will be validated first. " +
+            "The current configuration will then be saved " +
+            "as an emergency snapshot before restoration."
+        );
+
+        if (!confirmed) return;
+
+        button.disabled = true;
+        button.textContent = "UPLOADING…";
+
+        status.textContent =
+            `VALIDATING AND RESTORING ${file.name}…`;
+
+        try {
+            const response = await fetch(
+                "/api/system/backup/restore-upload",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/zip"
+                    },
+                    body: file
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.error ||
+                    result.service_error ||
+                    `HTTP ${response.status}`
+                );
+            }
+
+            button.classList.add("success");
+            button.textContent = "RESTORED";
+
+            status.textContent =
+                "BACKUP RESTORED • SAFETY SNAPSHOT: " +
+                result.emergency_snapshot;
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1800);
+
+        } catch (error) {
+            button.classList.add("failure");
+            button.textContent = "FAILED";
+            button.disabled = false;
+
+            status.textContent =
+                "BACKUP RESTORE FAILED: " +
+                error.message;
+        }
+    });
+})();
+</script>
+
+<style id="smrt-dynamic-voicings">
+.voicing-library {
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    width:100%;
+}
+
+.voicing-family {
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.voicing-family-title {
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#7f8996;
+    border-bottom:1px solid #242a32;
+    padding-bottom:4px;
+}
+
+.voicing-family-buttons {
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.voicing-family-buttons .preset-button {
+    flex:0 0 auto;
+}
+
+.voicing-family-buttons .preset-button.selected {
+    box-shadow:0 0 0 1px currentColor inset;
+}
+
+.voicing-loading {
+    color:#7f8996;
+    font-size:11px;
+    letter-spacing:.1em;
+}
+</style>
+
+<style id="smrt-responsive-fill">
+/* SMRT — make application content consume the available viewport */
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    min-height: 100dvh;
+}
+
+.page.active {
+    width: 100%;
+    max-width: none !important;
+    min-height: calc(100dvh - 64px);
+    flex: 1 1 auto;
+}
+
+/* Conventional grids */
+.grid,
+.np-release-grid,
+.system-control-grid,
+.system-backup-grid {
+    width: 100%;
+    max-width: none !important;
+}
+
+/* Meter dashboard */
+#smrtMeterGrid {
+    width: 100% !important;
+    max-width: none !important;
+    flex: 1 1 auto;
+    min-height: calc(100dvh - 180px);
+}
+
+/* GridStack owns positioning; allow its canvas to use full viewport */
+#smrtMeterGrid.grid-stack {
+    width: 100% !important;
+}
+
+/* Panels should fill the GridStack cells */
+#smrtMeterGrid .grid-stack-item-content {
+    width: auto;
+    height: auto;
+    inset: 0;
+}
+
+/* Media/canvas elements fill their assigned panel */
+.page canvas,
+.page svg,
+.page video {
+    max-width: 100%;
+}
+
+/* Remove arbitrary desktop width ceilings */
+.page > *,
+.page section {
+    max-width: none;
+}
+
+/* Portrait screens get the same full-canvas behavior */
+@media (orientation: portrait) {
+    .page.active {
+        min-height: calc(100dvh - 56px);
+    }
+
+    #smrtMeterGrid {
+        min-height: calc(100dvh - 160px);
+    }
+}
+</style>
