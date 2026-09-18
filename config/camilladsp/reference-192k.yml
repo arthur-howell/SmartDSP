@@ -1,0 +1,134 @@
+title: SmartDSP Reference Stereo
+description: Reference USB-to-USB stereo DSP configuration at 192 kHz / 32-bit
+
+devices:
+  samplerate: 192000
+  capture_samplerate: 192000
+  chunksize: 1024
+  adjust_period: 3
+  enable_rate_adjust: true
+
+  capture:
+    type: Alsa
+    channels: 2
+    device: SMARTDSP_CAPTURE
+    format: S32_LE
+    stop_on_inactive: false
+
+  playback:
+    type: Alsa
+    channels: 2
+    device: SMARTDSP_PLAYBACK
+    format: S32_LE
+
+filters:
+
+  Anti-Clip:
+    type: Limiter
+    parameters:
+      clip_limit: 0
+      soft_clip: true
+
+  Headroom:
+    type: Gain
+    description: Provides 6 dB of processing headroom.
+    parameters:
+      gain: -6
+      inverted: false
+      mute: false
+      scale: dB
+
+  Infrasonic:
+    type: Biquad
+    description: Reference La Scala infrasonic high-pass filter.
+    parameters:
+      type: Highpass
+      freq: 42
+      q: 0.8
+
+  Squawker:
+    type: Biquad
+    description: Mild correction of the reference system midrange response.
+    parameters:
+      type: Peaking
+      freq: 4500
+      gain: -0.8
+      q: 1.5
+
+  HF-Rolloff:
+    type: Biquad
+    description: Gentle high-frequency rolloff for the reference system.
+    parameters:
+      type: Highshelf
+      freq: 16000
+      gain: -1.5
+      q: 0.61
+
+mixers:
+
+  Stereo:
+    channels:
+      in: 2
+      out: 2
+    labels:
+      - Left
+      - Right
+    mapping:
+      - dest: 0
+        mute: false
+        sources:
+          - channel: 0
+            gain: 0
+            inverted: false
+            mute: false
+            scale: dB
+
+      - dest: 1
+        mute: false
+        sources:
+          - channel: 1
+            gain: 0
+            inverted: false
+            mute: false
+            scale: dB
+
+pipeline:
+
+  - type: Filter
+    description: Soft clipping protection
+    bypassed: false
+    channels: null
+    names:
+      - Anti-Clip
+
+  - type: Filter
+    description: Infrasonic filtering
+    bypassed: false
+    channels: null
+    names:
+      - Infrasonic
+
+  - type: Filter
+    description: Midrange correction
+    bypassed: false
+    channels: null
+    names:
+      - Squawker
+
+  - type: Filter
+    description: High-frequency rolloff
+    bypassed: false
+    channels: null
+    names:
+      - HF-Rolloff
+
+  - type: Filter
+    description: Processing headroom
+    bypassed: false
+    channels:
+      - 0
+      - 1
+    names:
+      - Headroom
+
+processors: {}
