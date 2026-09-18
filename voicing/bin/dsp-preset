@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+import json, os, sys, subprocess
+from pathlib import Path
+
+HOME=Path.home()
+FIFO=HOME/".local/run/dsp-saturator.cmd"
+STATE=HOME/".config/smrt-dsp/current-preset"
+LIB=HOME/".config/smrt-dsp/voicings.json"
+
+def load():
+    with LIB.open() as f: return json.load(f)
+
+def send(s):
+    with FIFO.open("w") as f: f.write(s+"\n")
+
+def check():
+    p=subprocess.run(["systemctl","--user","is-active","--quiet","dsp-saturator.service"])
+    if p.returncode: sys.exit("ERROR: dsp-saturator.service is not running.")
+    if not FIFO.exists(): sys.exit("ERROR: Saturator control FIFO is unavailable.")
+
+def apply(name, v):
+    # Full reset/application prevents preset state leaking between voicings.
+    order=("level_in","level_out","lp_pre_freq","hp_pre_freq","lp_post_freq","hp_post_freq",
+           "p_freq","p_level","p_q","pre","post","drive","blend","mix","bypass")
+    for k in order: send(f"set {k} {v[k]}")
+    STATE.parent.mkdir(parents=True,exist_ok=True)
+    STATE.write_text(name+"\n")
+    print(f"DSP preset: {v['label']}")
+    print("Saturator: "+("BYPASSED" if v["bypass"] else "ACTIVE"))
+
+def main():
+    lib=load()
+    cmd=sys.argv[1].lower() if len(sys.argv)>1 else "status"
+    if cmd in ("list","--list"):
+        last=None
+        for n,v in lib.items():
+            fam=v.get("family","Other")
+            if fam!=last: print(f"\n[{fam}]"); last=fam
+            print(f"  {n:26} {v['label']}")
+        return
+    if cmd=="json":
+        print(json.dumps(lib,indent=2)); return
+    if cmd=="status":
+        cur=STATE.read_text().strip() if STATE.exists() else "unknown"
+        print("DSP preset:",cur)
+        subprocess.run(["systemctl","--user","is-active","dsp-saturator.service"])
+        return
+    if cmd not in lib:
+        sys.exit("Unknown voicing. Run: dsp-preset list")
+    check(); apply(cmd,lib[cmd])
+
+if __name__=="__main__": main()

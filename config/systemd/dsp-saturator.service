@@ -1,0 +1,15 @@
+[Unit]
+Description=DSP Calf Saturator LV2
+After=pipewire.service wireplumber.service
+Requires=pipewire.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/rm -f %h/.local/run/dsp-saturator.cmd
+ExecStartPre=/usr/bin/mkfifo %h/.local/run/dsp-saturator.cmd
+ExecStart=/bin/sh -c 'exec /usr/bin/pw-jack /usr/bin/jalv -n dsp-saturator -c bypass=1 -c level_in=1.0 -c level_out=1.0 -c mix=1.0 -c drive=5.0 -c blend=10.0 -c lp_pre_freq=20000 -c hp_pre_freq=10 -c lp_post_freq=20000 -c hp_post_freq=10 -c p_freq=2000 -c p_level=1.0 -c p_q=1.0 -c pre=0 -c post=0 http://calf.sourceforge.net/plugins/Saturator <> %h/.local/run/dsp-saturator.cmd'
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target
